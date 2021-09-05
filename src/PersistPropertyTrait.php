@@ -27,6 +27,11 @@ trait PersistPropertyTrait
         $this->setObjectHash();
     }
 
+    public function setRemoval(): void
+    {
+        $this->removal = true;
+    }
+
     public function isPropertyChanged(): bool
     {
         return $this->objectHash !== $this->makeHash($this->getPureObject());
@@ -40,11 +45,6 @@ trait PersistPropertyTrait
     public function isRemoval(): bool
     {
         return $this->removal;
-    }
-
-    public function setRemoval(): void
-    {
-        $this->removal = true;
     }
 
     private function getPureObject(): self
