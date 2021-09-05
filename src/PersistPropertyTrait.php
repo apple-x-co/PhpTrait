@@ -16,31 +16,20 @@ trait PersistPropertyTrait
     /** @var bool */
     private $removal = false;
 
-    private function getPureObject(): self
+    public function objectInitialized(): void
     {
-        $object = clone $this;
-        $object->objectHash = null;
-        $object->persisted = null;
-        $object->removal = null;
-
-        return $object;
+        $this->setObjectHash();
     }
 
-    protected function setObjectHash(): void
+    public function objectReconstruction(): void
     {
-        $object = $this->getPureObject();
-        $this->objectHash = md5(serialize($object));
+        $this->setPersisted();
+        $this->setObjectHash();
     }
 
     public function isPropertyChanged(): bool
     {
-        $object = $this->getPureObject();
-        return $this->objectHash !== md5(serialize($object));
-    }
-
-    protected function setPersisted(): void
-    {
-        $this->persisted = true;
+        return $this->objectHash !== $this->makeHash($this->getPureObject());
     }
 
     public function isPersisted(): bool
@@ -53,8 +42,33 @@ trait PersistPropertyTrait
         return $this->removal;
     }
 
-    public function setRemoval(bool $removal): void
+    public function setRemoval(): void
     {
-        $this->removal = $removal;
+        $this->removal = true;
+    }
+
+    private function getPureObject(): self
+    {
+        $object = clone $this;
+        $object->objectHash = null;
+        $object->persisted = null;
+        $object->removal = null;
+
+        return $object;
+    }
+
+    private function setObjectHash(): void
+    {
+        $this->objectHash = $this->makeHash($this->getPureObject());
+    }
+
+    private function setPersisted(): void
+    {
+        $this->persisted = true;
+    }
+
+    private function makeHash($object): string
+    {
+        return md5(serialize($object));
     }
 }
